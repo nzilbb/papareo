@@ -84,7 +84,6 @@ public class PapaReoException extends Exception {
   /**
    * JSON response if available.
    * @see #getJson()
-   * @see #setJson(JsonObject)
    */
   protected JsonObject json;
   /**

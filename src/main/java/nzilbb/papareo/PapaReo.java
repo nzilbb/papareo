@@ -41,6 +41,41 @@ import org.apache.http.impl.client.HttpClients;
 
 /**
  * Client for the <a href="https://api.papareo.io/docs">Papa Reo web API</a>.
+ *
+ * <h2>Usage</h2>
+ *
+ * <p> Use the this class for accessing the web API, something like:
+ * <pre>
+ * // Create client with access token
+ * PapaReo papaReo = new PapaReo().setToken(token);
+ * 
+ * // short utterance transcription:
+ * File wav = new File("short-utterance.wav");
+ * String text = papaReo.transcribeUtterance(new FileInputStream(wav));
+ * System.out.println(text);
+ * 
+ * // long recording transcription:
+ * File wav = new File("long-speech.wav");
+ * 
+ * // start transcription task
+ * String taskId = papaReo.transcribeLarge(new FileInputStream(wav));
+ * 
+ * // wait for it to complete
+ * String status = papaReo.transcribeLargeStatus(taskId);
+ * while (("STARTED".equals(status) || "PENDING".equals(status)) &amp;&amp; patience &gt; 0) {
+ *   try {Thread.sleep(1000);} catch(Exception exception) {}
+ *   status = papaReo.transcribeLargeStatus(taskId);
+ * }
+ * 
+ * // save the resulting VTT file
+ * InputStream stream = papaReo.transcribeLargeDownload(taskId);
+ * File vtt = new File("long-speech.vtt");
+ * java.nio.file.Files.copy(
+ *       stream, 
+ *       vtt.toPath(), 
+ *       StandardCopyOption.REPLACE_EXISTING);
+ * stream.close();
+ * </pre>
  * @author Robert Fromont robert@fromont.net.nz
  */
 public class PapaReo {
@@ -207,7 +242,7 @@ public class PapaReo {
   }
 
   /**
-   * Convenience method for calling {@link #transcript(InputStream,boolean)} and getting
+   * Convenience method for calling {@link #transcribe(InputStream,boolean)} and getting
    * back just the transcript.
    * @param audio_file The contents of the audio file to transcribe.
    * @throws IOException If a communication error occurs.
