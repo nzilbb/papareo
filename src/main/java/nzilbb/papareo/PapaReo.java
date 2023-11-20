@@ -79,7 +79,7 @@ import org.apache.http.impl.client.HttpClients;
  *
  * <p> Note that the access token can also be specified by:
  * <ul>
- *  <li> setting the <var>PAPAREO_TOKEN</var> environment variable, or </ul>
+ *  <li> setting the <var>PAPAREO_TOKEN</var> environment variable, or </li>
  *  <li> setting the <var>papareo.token</var> system property
  *       (e.g. <tt>java -Dpapareo.token=xxxx</tt> ...). </li>
  * </ul>
