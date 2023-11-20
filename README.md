@@ -8,6 +8,8 @@ New Zealand English.
 
 ## Usage
 
+Full documententation is available here: <https://nzilbb.github.io/papareo/>
+
 You need to `import nzilbb.papareo.PapaReo;` and then instantiate a `PapaReo` object, and set the access token:
 ```
 PapaReo papaReo = new PapaReo().setToken(token);
