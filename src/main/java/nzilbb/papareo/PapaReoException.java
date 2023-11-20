@@ -27,7 +27,7 @@ import org.apache.http.StatusLine;
 
 /**
  * Exception releated to a Papa Reo API call.
- * @author Robert Fromont robert@fromont.net.nz
+ * @author Robert Fromont robert.fromont@canterbury.ac.nz
  */
 public class PapaReoException extends Exception {
   

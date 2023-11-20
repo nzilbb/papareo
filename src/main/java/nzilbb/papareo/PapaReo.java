@@ -76,7 +76,14 @@ import org.apache.http.impl.client.HttpClients;
  *       StandardCopyOption.REPLACE_EXISTING);
  * stream.close();
  * </pre>
- * @author Robert Fromont robert@fromont.net.nz
+ *
+ * <p> Note that the access token can also be specified by:
+ * <ul>
+ *  <li> setting the <var>PAPAREO_TOKEN</var> environment variable, or </ul>
+ *  <li> setting the <var>papareo.token</var> system property
+ *       (e.g. <tt>java -Dpapareo.token=xxxx</tt> ...). </li>
+ * </ul>
+ * @author Robert Fromont robert.fromont@canterbury.ac.nz
  */
 public class PapaReo {
 
