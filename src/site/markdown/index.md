@@ -8,12 +8,46 @@ New Zealand English.
 
 ## Usage
 
-You need to `import nzilbb.papareo.PapaReo;` and then instantiate a `PapaReo` object:
+You need to `import nzilbb.papareo.PapaReo;` and then instantiate a `PapaReo` object, and set the access token:
 ```
-PapaReo papaReo = new PapaReo();
+PapaReo papaReo = new PapaReo().setToken(token);
 ```
 
-Once that's done, you can invoke the function you need, and check/retrieve the results.
+Note that the access token can also be specified by:
+
+- setting the `PAPAREO_TOKEN` environment variable, or
+- setting the `papareo.token` system property.
+
+Once that's done, you can invoke the function you need, and check/retrieve the results, e.g.
+
+```
+// short utterance transcription:
+File wav = new File("short-utterance.wav");
+String text = papaReo.transcribeUtterance(new FileInputStream(wav));
+System.out.println(text);
+
+// long recording transcription:
+File wav = new File("long-speech.wav");
+
+// start transcription task
+String taskId = papaReo.transcribeLarge(new FileInputStream(wav));
+
+// wait for it to complete
+String status = papaReo.transcribeLargeStatus(taskId);
+while (("STARTED".equals(status) || "PENDING".equals(status)) && patience > 0) {
+  try {Thread.sleep(1000);} catch(Exception exception) {}
+  status = papaReo.transcribeLargeStatus(taskId);
+}
+
+// save the resulting VTT file
+InputStream stream = papaReo.transcribeLargeDownload(taskId);
+File vtt = new File("long-speech.vtt");
+java.nio.file.Files.copy(
+      stream, 
+      vtt.toPath(), 
+      StandardCopyOption.REPLACE_EXISTING);
+stream.close();
+```
 
 ## API
 
