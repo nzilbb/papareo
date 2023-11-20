@@ -55,6 +55,7 @@ public class TestPapaReo {
 
   static PapaReo papaReo = null;
   
+  /** Set the access token before any tests run. */
   @BeforeClass
   public static void setToken() throws Exception {
     papaReo = new PapaReo();
@@ -189,7 +190,8 @@ public class TestPapaReo {
    * @param fNewDir Directory for text files.
    */
   public void setDir(File fNewDir) { fDir = fNewDir; }
-  
+
+  /** Standalone entrypoint. */
   public static void main(String args[]) {
     org.junit.runner.JUnitCore.main("nzilbb.papareo.TestPapaReo");
   }
