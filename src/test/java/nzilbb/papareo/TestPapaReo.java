@@ -66,7 +66,7 @@ public class TestPapaReo {
   }
   
   /**
-   * Test
+   * Test invocation of
    * <a href="https://api.papareo.io/docs#/Speech%20Recognition/transcribe_tuhi_transcribe_post">
    * transcribe</a> method with meta-data.
    */
@@ -84,7 +84,7 @@ public class TestPapaReo {
   }
   
   /**
-   * Test
+   * Test invocation of
    * <a href="https://api.papareo.io/docs#/Speech%20Recognition/transcribe_tuhi_transcribe_post">
    * transcribe</a> method without meta-data.
    */
@@ -97,7 +97,7 @@ public class TestPapaReo {
   }
   
   /**
-   * Test
+   * Test invocation of
    * <a href="https://api.papareo.io/docs#/Speech%20Recognition%20-%20Large%20Audio%20Files/transcribe_large_tuhi_transcribe_large_post">
    * transcribe/large</a> and
    * <a href="https://api.papareo.io/docs#/Speech%20Recognition%20-%20Large%20Audio%20Files/transcribe_large_cancel_tuhi_transcribe_large__task_id__cancel_post">
@@ -115,11 +115,13 @@ public class TestPapaReo {
   }
   
   /**
-   * Test
+   * Test invocation of
    * <a href="https://api.papareo.io/docs#/Speech%20Recognition%20-%20Large%20Audio%20Files/transcribe_large_tuhi_transcribe_large_post">
-   * transcribe/large</a> and
-   * <a href="https://api.papareo.io/docs#/Speech%20Recognition%20-%20Large%20Audio%20Files/transcribe_large_cancel_tuhi_transcribe_large__task_id__cancel_post">
-   * transcribe/large/{task_id}/cancel</a>
+   * transcribe/large</a>,
+   * <a href="https://api.papareo.io/docs#/Speech%20Recognition%20-%20Large%20Audio%20Files/transcribe_large_status_tuhi_transcribe_large__task_id__status_get">
+   * transcribe/large/{task_id}/status</a>, and
+   * <a href="https://api.papareo.io/docs#/Speech%20Recognition%20-%20Large%20Audio%20Files/transcribe_large_download_tuhi_transcribe_large__task_id__download_get">
+   * transcribe/large/{task_id}/download</a>
    */
   @Test public void transcribeLargeAndDownload()
     throws FileNotFoundException, IOException, PapaReoException {
