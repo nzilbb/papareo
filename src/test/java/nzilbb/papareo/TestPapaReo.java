@@ -123,7 +123,7 @@ public class TestPapaReo {
    */
   @Test public void transcribeLargeAndDownload()
     throws FileNotFoundException, IOException, PapaReoException {
-    File wav = new File(getDir(), "utterance.wav");
+    File wav = new File(getDir(), "wordlist.wav");
     // papaReo.setDebug(true);
     // start the transcription task
     String taskId = papaReo.transcribeLarge(new FileInputStream(wav));
