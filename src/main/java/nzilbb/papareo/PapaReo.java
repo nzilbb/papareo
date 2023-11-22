@@ -28,7 +28,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
-import java.util.concurrent.CompletableFuture;
 import java.util.Optional;
 import javax.json.Json;
 import javax.json.JsonException;
@@ -430,11 +429,10 @@ public class PapaReo {
   
   /**
    * Convenience function that returns the transcript given a large recording.
-   * <p> The returned CompletableFuture object, when invoked, uses {@link #transcribeLarge(File)},
-   * {@link #transcribeLargeStatus(String)}, and {@link #transcribeLargeDownload(String)}
-   * to upload the long recording, wait for transcription to finish, and download the
-   * VTT-formatted transcript to a temporary file, which is the result of the
-   * CompletableFuture.
+   * <p> The returned CompletableFuture object, when invoked, uses
+   * {@link #transcribeLarge(InputStream)}, {@link #transcribeLargeStatus(String)},
+   * and {@link #transcribeLargeDownload(String)} to upload the long recording, wait for
+   * transcription to finish, and download the VTT-formatted transcript to a temporary file.
    * <p> <em>NB</em> It is the callers responsibility to delete the transcript file when
    * processing is complete.
    * @param audio_file The recording to transcribe.
