@@ -29,6 +29,7 @@ import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.Optional;
+import java.util.function.Consumer;
 import javax.json.Json;
 import javax.json.JsonException;
 import javax.json.JsonObject;
@@ -123,32 +124,40 @@ public class PapaReo {
    */
   public PapaReo(String token) {
     httpclient = HttpClients.createDefault();
-    setToken(token);
+    if (token == null || token.length() == 0) {
+      token = System.getProperty("papareo.token");
+    }
+    if (token == null || token.length() == 0) {
+      token = System.getenv("PAPAREO_TOKEN");
+    }
+    if (token != null && token.length() > 0) {
+      setToken(token);
+    }
   }
   
   /**
-   * Whether to print debugging status messages to System.err or not.
+   * Consumber of debug messages.
    * @see #getDebug()
-   * @see #setDebug(boolean)
+   * @see #setDebug(Consumer)
    */
-  protected boolean debug = false;
+  protected Consumer<String> debug;
   /**
-   * Getter for {@link #debug}: Whether to print debugging status messages to System.err or not.
-   * @return Whether to print debugging status messages to System.err or not.
+   * Getter for {@link #debug}: Consumber of debug messages.
+   * @return Consumber of debug messages.
    */
-  public boolean getDebug() { return debug; }
+  public Consumer<String> getDebug() { return debug; }
   /**
-   * Setter for {@link #debug}: Whether to print debugging status messages to System.err or not.
-   * @param newDebug Whether to print debugging status messages to System.err or not.
+   * Setter for {@link #debug}: Consumber of debug messages.
+   * @param newDebug Consumber of debug messages.
    */
-  public PapaReo setDebug(boolean newDebug) { debug = newDebug; return this; }
+  public PapaReo setDebug(Consumer<String> newDebug) { debug = newDebug; return this; }
   
   /**
    * Print a debug message if in debug mode.
    * @param message
    */
   public void debug(String message) {
-    if (debug) System.err.println(message);
+    if (debug != null) debug.accept(message);
   } // end of debug()
   
   /**
@@ -187,7 +196,6 @@ public class PapaReo {
           getClass().getPackage().getImplementationVersion())
         .orElse("dev") + ")";
     }
-    debug("user-agent: "+userAgent);
     return userAgent;
   }
   
@@ -446,30 +454,34 @@ public class PapaReo {
     debug("transcribeRecording "+audio_file.getName());
     // upload the audio and start transcription
     currentTaskId = transcribeLarge(new FileInputStream(audio_file));
-    debug("transcribeRecording taskId "+currentTaskId);
-    
-    // monitor progress
-    String status = transcribeLargeStatus(currentTaskId);
-    while (currentTaskId != null
-           && ("STARTED".equals(status) || "PENDING".equals(status))) {
-      debug("transcribeRecording waiting: " + status);
-      try {Thread.sleep(1000);} catch(Exception exception) {}
-      status = transcribeLargeStatus(currentTaskId);
+    try {
+      debug("transcribeRecording taskId "+currentTaskId);
+      
+      // monitor progress
+      String status = transcribeLargeStatus(currentTaskId);
+      while (currentTaskId != null
+             && ("STARTED".equals(status) || "PENDING".equals(status))) {
+        debug("transcribeRecording waiting: " + status);
+        try {Thread.sleep(1000);} catch(Exception exception) {}
+        status = transcribeLargeStatus(currentTaskId);
+      }
+      debug("transcribeRecording final status: " + status);
+      
+      if (currentTaskId == null) {
+        throw new PapaReoException("Cancelled");
+      }
+      
+      // download the result
+      InputStream stream = transcribeLargeDownload(currentTaskId);
+      File vtt = File.createTempFile(audio_file.getName()+"-", ".vtt");
+      vtt.deleteOnExit();
+      Files.copy(stream, vtt.toPath(), StandardCopyOption.REPLACE_EXISTING);
+      stream.close();
+      
+      return vtt;
+    } finally {
+      currentTaskId = null;
     }
-    debug("transcribeRecording final status: " + status);
-
-    if (currentTaskId == null) {
-      throw new PapaReoException("Cancelled");
-    }
-    
-    // download the result
-    InputStream stream = transcribeLargeDownload(currentTaskId);
-    File vtt = File.createTempFile(audio_file.getName()+"-", ".vtt");
-    vtt.deleteOnExit();
-    Files.copy(stream, vtt.toPath(), StandardCopyOption.REPLACE_EXISTING);
-    stream.close();
-    
-    return vtt;
   } // end of transcribeRecording()
 
 } // end of class PapaReo

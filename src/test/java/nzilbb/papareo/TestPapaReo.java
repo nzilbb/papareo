@@ -129,7 +129,7 @@ public class TestPapaReo {
   @Test public void transcribeLargeAndDownload()
     throws FileNotFoundException, IOException, PapaReoException {
     File wav = new File(getDir(), "wordlist.wav");
-    // papaReo.setDebug(true);
+    // papaReo.setDebug(m -> System.out.println(m));
     // start the transcription task
     String taskId = papaReo.transcribeLarge(new FileInputStream(wav));
     System.out.println("task_id: " + taskId);
@@ -180,7 +180,7 @@ public class TestPapaReo {
   @Test public void transcribeRecording()
     throws FileNotFoundException, IOException, PapaReoException, InterruptedException, ExecutionException {
     File wav = new File(getDir(), "wordlist.wav");
-    //papaReo.setDebug(true);
+    // papaReo.setDebug(m -> System.out.println(m));
     File vtt = papaReo.transcribeRecording(wav);
     assertNotNull("File returned", vtt);
     System.out.println(vtt.getPath());

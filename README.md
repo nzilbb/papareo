@@ -102,7 +102,7 @@ To perform a release deployment:
    ```
 2. Execute the command:  
    ```
-   mvn clean deploy -P release -pl :nzilbb.ag
+   mvn clean deploy -P release
    ```
 3. Happy with everything? Complete the release with:
    ```

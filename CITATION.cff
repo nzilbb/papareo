@@ -20,8 +20,8 @@ keywords:
 - Te Reo Māori
 - New Zealand English
 license: AGPL-3.0-or-later
-version: 0.1.0-SNAPSHOT
-date-released: 2023-11-21
+version: 0.1.0
+date-released: 2023-11-22
 references:
 - type: software
   title: Apache Commons Codec

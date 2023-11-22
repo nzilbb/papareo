@@ -6,7 +6,7 @@
 
   <groupId>nz.ilbb.papareo</groupId>
   <artifactId>nzilbb.papareo</artifactId>
-  <version>0.1.0-SNAPSHOT</version>
+  <version>0.1.0</version>
 
   <name>nzilbb.papareo</name>
   <description>Java client for for Papa Reo API, which performs speech recognition and
