@@ -198,7 +198,7 @@ public class TestPapaReo {
     }
     reader.close();
 
-    //vtt.delete();
+    vtt.delete();
   }
   
   /**
