@@ -30,11 +30,14 @@ import java.io.InputStreamReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URL;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import javax.json.JsonObject;
 
 /**
@@ -162,6 +165,40 @@ public class TestPapaReo {
       }
       reader.close();
     }
+  }
+  
+  /**
+   * Test invocation of
+   * <a href="https://api.papareo.io/docs#/Speech%20Recognition%20-%20Large%20Audio%20Files/transcribe_large_tuhi_transcribe_large_post">
+   * transcribe/large</a>,
+   * <a href="https://api.papareo.io/docs#/Speech%20Recognition%20-%20Large%20Audio%20Files/transcribe_large_status_tuhi_transcribe_large__task_id__status_get">
+   * transcribe/large/{task_id}/status</a>, and
+   * <a href="https://api.papareo.io/docs#/Speech%20Recognition%20-%20Large%20Audio%20Files/transcribe_large_download_tuhi_transcribe_large__task_id__download_get">
+   * transcribe/large/{task_id}/download</a>
+   * as used by the {@link PapaReo#transcribeRecording(File)} method.
+   */
+  @Test public void transcribeRecording()
+    throws FileNotFoundException, IOException, PapaReoException, InterruptedException, ExecutionException {
+    File wav = new File(getDir(), "wordlist.wav");
+    //papaReo.setDebug(true);
+    File vtt = papaReo.transcribeRecording(wav);
+    assertNotNull("File returned", vtt);
+    System.out.println(vtt.getPath());
+    
+    // check file
+    BufferedReader reader = new BufferedReader(new FileReader(vtt));
+    
+    // ensure the result is a VTT  file
+    String line = reader.readLine();
+    assertEquals("Is a VTT file", "WEBVTT", line);
+    // read the rest of the transcript
+    while (line != null) {
+      System.out.println(line);
+      line = reader.readLine();
+    }
+    reader.close();
+
+    //vtt.delete();
   }
   
   /**

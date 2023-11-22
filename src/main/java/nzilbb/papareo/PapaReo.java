@@ -21,9 +21,14 @@
 //
 package nzilbb.papareo;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
+import java.util.concurrent.CompletableFuture;
 import java.util.Optional;
 import javax.json.Json;
 import javax.json.JsonException;
@@ -40,7 +45,8 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 
 /**
- * Client for the <a href="https://api.papareo.io/docs">Papa Reo web API</a>.
+ * Client for the <a href="https://api.papareo.io/docs">Papa Reo web API</a>
+ * published by <a href="https://tehiku.nz/">Te Hiku Media</a>.
  *
  * <h2>Usage</h2>
  *
@@ -92,6 +98,7 @@ public class PapaReo {
 
   private CloseableHttpClient httpclient;
   private HttpRequestBase currentRequest;
+  private String currentTaskId;
 
   /**
    * Default constructor.
@@ -179,7 +186,7 @@ public class PapaReo {
       userAgent = getClass().getName()
         + " (" + Optional.ofNullable(
           getClass().getPackage().getImplementationVersion())
-        .orElse("automated-test") + ")";
+        .orElse("dev") + ")";
     }
     debug("user-agent: "+userAgent);
     return userAgent;
@@ -199,6 +206,14 @@ public class PapaReo {
   public void cancel() {
     if (currentRequest != null) {
       currentRequest.abort();
+    }
+    if (currentTaskId != null) {
+      try {
+        transcribeLargeCancel(currentTaskId);
+      } catch (Throwable t) {
+      } finally {
+        currentTaskId = null;
+      }
     }
   } // end of cancel()
   
@@ -412,5 +427,51 @@ public class PapaReo {
       currentRequest = null;
     }
   }
+  
+  /**
+   * Convenience function that returns the transcript given a large recording.
+   * <p> The returned CompletableFuture object, when invoked, uses {@link #transcribeLarge(File)},
+   * {@link #transcribeLargeStatus(String)}, and {@link #transcribeLargeDownload(String)}
+   * to upload the long recording, wait for transcription to finish, and download the
+   * VTT-formatted transcript to a temporary file, which is the result of the
+   * CompletableFuture.
+   * <p> <em>NB</em> It is the callers responsibility to delete the transcript file when
+   * processing is complete.
+   * @param audio_file The recording to transcribe.
+   * @return The VTT-formatted transcript of the recording, which is the callers
+   * responsibility to remove or delete;
+   * @throws IOException If a communication error occurs.
+   * @throws PapaReoException If the Papa Reo API could not successfully process the
+   * request, or {@link #cancel()} was called.
+   */
+  public File transcribeRecording(File audio_file) throws IOException, PapaReoException {
+    debug("transcribeRecording "+audio_file.getName());
+    // upload the audio and start transcription
+    currentTaskId = transcribeLarge(new FileInputStream(audio_file));
+    debug("transcribeRecording taskId "+currentTaskId);
+    
+    // monitor progress
+    String status = transcribeLargeStatus(currentTaskId);
+    while (currentTaskId != null
+           && ("STARTED".equals(status) || "PENDING".equals(status))) {
+      debug("transcribeRecording waiting: " + status);
+      try {Thread.sleep(1000);} catch(Exception exception) {}
+      status = transcribeLargeStatus(currentTaskId);
+    }
+    debug("transcribeRecording final status: " + status);
+
+    if (currentTaskId == null) {
+      throw new PapaReoException("Cancelled");
+    }
+    
+    // download the result
+    InputStream stream = transcribeLargeDownload(currentTaskId);
+    File vtt = File.createTempFile(audio_file.getName()+"-", ".vtt");
+    vtt.deleteOnExit();
+    Files.copy(stream, vtt.toPath(), StandardCopyOption.REPLACE_EXISTING);
+    stream.close();
+    
+    return vtt;
+  } // end of transcribeRecording()
 
 } // end of class PapaReo
